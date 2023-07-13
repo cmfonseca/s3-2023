@@ -30,13 +30,11 @@ from api.utils import or_default, pairwise, sample2
 
 @dataclass
 class Component:
-    p: int # required time
-    w: int # weight
-    d: int # due date
+    k: int 
 
     @property
     def cid(self) -> Hashable:
-        return self.p, self.w, self.d
+        return self.k
 
 @dataclass
 class LocalMove:
@@ -112,21 +110,21 @@ class Solution():
 
     def heuristic_add_move(self) -> Optional[Component]:
         raise NotImplementedError
-        # Return the closest
-        # if len(self.path) < self.problem.n_items:
-        #     best = None
-        #     bestd = None
-        #     u = self.path[-1]
-        #     for v in self.unused:
-        #         d = self.problem.dist[u][v] 
-        #         if bestd is None or d < bestd:
-        #             best = Component(u, v)
-        #             bestd = d
-        #     return best
-        # elif len(self.path) == self.problem.n_items:
-        #     u = self.path[-1]
-        #     return Component(u, self.start)
-        # return None
+        Return the closest
+        if len(self.path) < self.problem.n_items:
+            best = None
+            bestd = None
+            u = self.path[-1]
+            for v in self.unused:
+                d = self.problem.dist[u][v] 
+                if bestd is None or d < bestd:
+                    best = Component(u, v)
+                    bestd = d
+            return best
+        elif len(self.path) == self.problem.n_items:
+            u = self.path[-1]
+            return Component(u, self.start)
+        return None
 
     def add(self, component: Component) -> None:
         raise NotImplementedError
