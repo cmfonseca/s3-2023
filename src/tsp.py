@@ -227,10 +227,10 @@ class Problem():
         return cls(coords)
 
     def empty_solution(self) -> Solution:
-        return Solution(self, 0, [0], {0}, set(range(1, self.nnodes)), 0)
+        return Solution(self, 0, Path([0]), Used({0}), Unused(set(range(1, self.nnodes))), 0)
 
     def empty_solution_with_start(self, start: int) -> Solution:
-        return Solution(self, start, [start], {start}, set(range(self.nnodes))-{start}, 0)
+        return Solution(self, start, Path([start]), Used({start}), Unused(set(range(self.nnodes))-{start}), 0)
 
 
 if __name__ == '__main__':
