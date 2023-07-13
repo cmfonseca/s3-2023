@@ -194,23 +194,24 @@ class Problem:
         n = int(f.readline())
         for idx in range(1, 5 + 4 * n):
             line = f.readline().strip()  # Remove leading/trailing whitespaces
-            elements = line.split()  # Split line by spaces
+            elements = [int(x) for x in line.split()]  # Split line by spaces
             if idx == 1:
-                depot_to_container[0] = [int(x) for x in elements]
+                depot_to_container[0] = elements
             elif idx == 2:
-                depot_to_container[1] = [int(x) for x in elements]
+                depot_to_container[1] = elements
             elif idx == 3:
-                container_to_plant[0] = [int(x) for x in elements]
+                container_to_plant[0] = elements
             elif idx == 4:
-                container_to_plant[1] = [int(x) for x in elements]
+                container_to_plant[1] = elements
             elif idx < n + 5:
-                container_to_container[0].append([int(x) for x in elements])
+                container_to_container[0].append(elements)
             elif idx < 2 * n + 5:
-                container_to_container[1].append([int(x) for x in elements])
+                container_to_container[1].append(elements)
             elif idx < 3 * n + 5:
-                container_to_container[2].append([int(x) for x in elements])
+                container_to_container[2].append(elements)
             else:
-                container_to_container[3].append([int(x) for x in elements])
+                container_to_container[3].append(elements)
+
         return cls(n, depot_to_container, container_to_plant, container_to_container)
 
 
