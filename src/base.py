@@ -34,14 +34,14 @@ class LocalMove:
         
 class Solution:
     def __init__(self,
-                 problem: Problem,
-                 obj_value: float) -> None:
-                     self.problem = problem
-                     self.containers = [] #list of all containers between depot and treatment plant 
-                     self.directions = [] #list of directions proportionate to the containers 
-                     self.picked = [] #list of all picked containers
-                     self.not_picked = [] #list of all not yet picked containers
-                     self.obj_value = obj_value
+         problem: Problem,
+         obj_value: float) -> None:
+             self.problem = problem
+             self.containers = [] #list of all containers between depot and treatment plant
+             self.directions = [] #list of directions proportionate to the containers
+             self.picked = [] #list of all picked containers
+             self.not_picked = [] #list of all not yet picked containers
+             self.obj_value = obj_value
       
     def output(self) -> str:
         no_of_containers = len(self.containers)
