@@ -110,21 +110,9 @@ class Solution():
 
     def heuristic_add_move(self) -> Optional[Component]:
         raise NotImplementedError
-        Return the closest
-        if len(self.path) < self.problem.n_items:
-            best = None
-            bestd = None
-            u = self.path[-1]
-            for v in self.unused:
-                d = self.problem.dist[u][v] 
-                if bestd is None or d < bestd:
-                    best = Component(u, v)
-                    bestd = d
-            return best
-        elif len(self.path) == self.problem.n_items:
-            u = self.path[-1]
-            return Component(u, self.start)
-        return None
+        #if len(self.path) < self.problem.n_items:
+        #    map(lambda k: self.problem.penalty_weights[k] / (self.problem.due_dates[k] + 1), self.unused)
+        #return None
 
     def add(self, component: Component) -> None:
         raise NotImplementedError
