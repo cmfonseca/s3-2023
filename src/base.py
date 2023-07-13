@@ -17,6 +17,7 @@
 
 from __future__ import annotations
 
+from copy import copy
 from typing import TextIO, Optional, Any
 from collections.abc import Iterable, Hashable
 
@@ -64,7 +65,7 @@ class Solution:
         Note: changes to the copy must not affect the original
         solution. However, this does not need to be a deepcopy.
         """
-        raise NotImplementedError
+        #raise NotImplementedError
 
     def is_feasible(self) -> bool:
         """
