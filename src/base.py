@@ -24,13 +24,16 @@ import logging
 
 Objective = Any
 
+
 class Component:
     @property
     def cid(self) -> Hashable:
         raise NotImplementedError
 
+
 class LocalMove:
     ...
+
 
 class Solution:
     def output(self) -> str:
@@ -98,7 +101,7 @@ class Solution:
         the solution.
         """
         raise NotImplementedError
-            
+
     def heuristic_add_move(self) -> Optional[Component]:
         """
         Return the next component to be added based on some heuristic
@@ -153,13 +156,46 @@ class Solution:
         """
         raise NotImplementedError
 
+
 class Problem:
+    def __int__(self, n, depot_to_container, container_to_plant, container_to_container):
+        self.n = n
+        self.depot_to_container = depot_to_container
+        self.container_to_plant = container_to_plant
+        # index - combination: 0 - 00, 1 - 10, 2 - 11, 3 - 10
+        self.container_to_container = container_to_container
+
     @classmethod
     def from_textio(cls, f: TextIO) -> Problem:
         """
         Create a problem from a text I/O source `f`
         """
-        raise NotImplementedError
+        depot_to_container = [[], []]
+        container_to_plant = [[], []]
+        # index - combination: 0 - 00, 1 - 10, 2 - 11, 3 - 10
+        container_to_container = [[], [], [], []]
+
+        n = int(f.readline())
+        for idx in range(1, 5 + 4 * n):
+            line = f.readline().strip()  # Remove leading/trailing whitespaces
+            elements = line.split()  # Split line by spaces
+            if idx == 1:
+                depot_to_container[0] = [int(x) for x in elements]
+            elif idx == 2:
+                depot_to_container[1] = [int(x) for x in elements]
+            elif idx == 3:
+                container_to_plant[0] = [int(x) for x in elements]
+            elif idx == 4:
+                container_to_plant[1] = [int(x) for x in elements]
+            elif idx < n + 5:
+                container_to_container[0].append([int(x) for x in elements])
+            elif idx < 2 * n + 5:
+                container_to_container[1].append([int(x) for x in elements])
+            elif idx < 3 * n + 5:
+                container_to_container[2].append([int(x) for x in elements])
+            else:
+                container_to_container[3].append([int(x) for x in elements])
+        return cls(n, depot_to_container, container_to_plant, container_to_container)
 
     def empty_solution(self) -> Solution:
         """
@@ -208,19 +244,19 @@ if __name__ == '__main__':
         elif args.csearch == 'beam':
             s = beam_search(s, 10)
         elif args.csearch == 'grasp':
-            s = grasp(s, args.cbudget, alpha = 0.01)
+            s = grasp(s, args.cbudget, alpha=0.01)
         elif args.csearch == 'as':
-            ants = [s]*100
-            s = ant_system(ants, args.cbudget, beta = 5.0, rho = 0.5, tau0 = 1 / 3000.0)
+            ants = [s] * 100
+            s = ant_system(ants, args.cbudget, beta=5.0, rho=0.5, tau0=1 / 3000.0)
         elif args.csearch == 'mmas':
-            ants = [s]*100
-            s = mmas(ants, args.cbudget, beta = 5.0, rho = 0.02, taumax = 1 / 3000.0, globalratio = 0.5)
+            ants = [s] * 100
+            s = mmas(ants, args.cbudget, beta=5.0, rho=0.02, taumax=1 / 3000.0, globalratio=0.5)
 
     if s is not None:
         if args.lsearch == 'bi':
             s = best_improvement(s, args.lbudget)
         elif args.lsearch == 'fi':
-            s = first_improvement(s, args.lbudget) 
+            s = first_improvement(s, args.lbudget)
         elif args.lsearch == 'ils':
             s = ils(s, args.lbudget)
         elif args.lsearch == 'rls':
@@ -239,5 +275,4 @@ if __name__ == '__main__':
     else:
         logging.info(f"Objective: no solution found")
 
-    logging.info(f"Elapsed solving time: {end-start:.4f}")
-
+    logging.info(f"Elapsed solving time: {end - start:.4f}")
