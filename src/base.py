@@ -173,17 +173,44 @@ class Solution:
 
 class Problem:
     @classmethod
+    def __int__(self, n, depot_to_container, container_to_plant, container_to_container):
+        self.n = n
+        self.depot_to_container = depot_to_container
+        self.container_to_plant = container_to_plant
+        # index - combination: 0 - 00, 1 - 10, 2 - 11, 3 - 10
+        self.container_to_container = container_to_container
+
+    @classmethod
     def from_textio(cls, f: TextIO) -> Problem:
         """
         Create a problem from a text I/O source `f`
         """
-        raise NotImplementedError
+        depot_to_container = [[], []]
+        container_to_plant = [[], []]
+        # index - combination: 0 - 00, 1 - 10, 2 - 11, 3 - 10
+        container_to_container = [[], [], [], []]
 
-    def empty_solution(self) -> Solution:
-        """
-        Create an empty solution (i.e. with no components).
-        """
-        raise NotImplementedError
+        n = int(f.readline())
+        for idx in range(1, 5 + 4 * n):
+            line = f.readline().strip()  # Remove leading/trailing whitespaces
+            elements = line.split()  # Split line by spaces
+            if idx == 1:
+                depot_to_container[0] = [int(x) for x in elements]
+            elif idx == 2:
+                depot_to_container[1] = [int(x) for x in elements]
+            elif idx == 3:
+                container_to_plant[0] = [int(x) for x in elements]
+            elif idx == 4:
+                container_to_plant[1] = [int(x) for x in elements]
+            elif idx < n + 5:
+                container_to_container[0].append([int(x) for x in elements])
+            elif idx < 2 * n + 5:
+                container_to_container[1].append([int(x) for x in elements])
+            elif idx < 3 * n + 5:
+                container_to_container[2].append([int(x) for x in elements])
+            else:
+                container_to_container[3].append([int(x) for x in elements])
+        return cls(n, depot_to_container, container_to_plant, container_to_container)
 
 
 if __name__ == '__main__':
