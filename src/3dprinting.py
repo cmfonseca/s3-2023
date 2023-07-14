@@ -153,15 +153,35 @@ class Solution():
             time_spent += self.problem.production_times[k]
             cost += self.problem.penalty_weights[k] * max(0, time_spent - self.problem.due_dates[k])
 
+    def calculate_cost(self, path=None) -> int:
+        # SUM(w * max(Cj - dj, 0))
+        cost = 0
+        C = 0
+        if path is None:
+            path = self.path
+            
+        for i in path:
+            C += self.problem.production_times[i]
+            d = self.problem.due_dates[i]
+            w = self.problem.penalty_weights[i]
+
+            cost += w * max(C - d, 0)
+
+        return cost
+
     def objective_incr_local(self, lmove: LocalMove) -> Optional[float]:
-        raise NotImplementedError
-        # i, j = lmove.i, lmove.j
-        # ndist = self.dist
-        # ndist -= self.problem.dist[self.path[i-1]][self.path[i]]
-        # ndist -= self.problem.dist[self.path[j-1]][self.path[j]]
-        # ndist += self.problem.dist[self.path[i-1]][self.path[j-1]]
-        # ndist += self.problem.dist[self.path[i]][self.path[j]]
-        # return ndist - self.dist
+        i, j = lmove.i, lmove.j
+        
+        # initialize new_solution
+        new_path = self.path 
+        # switch order between i and j
+        temp = new_path[i]
+        new_path[i] = new_path[j]
+        new_path[j] = temp
+
+        new_cost = self.calculate_cost(new_path)
+
+        return new_cost - self.cost
 
     def lower_bound_incr_add(self, component: Component) -> Optional[float]:
         # raise NotImplementedError
