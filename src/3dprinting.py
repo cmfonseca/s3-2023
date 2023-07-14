@@ -153,7 +153,7 @@ class Solution():
             time_spent += self.problem.production_times[k]
             cost += self.problem.penalty_weights[k] * max(0, time_spent - self.problem.due_dates[k])
 
-    def calculate_cost(self, path=None):
+    def calculate_cost(self, path=None) -> int:
         # SUM(w * max(Cj - dj, 0))
         cost = 0
         C = 0
@@ -170,25 +170,16 @@ class Solution():
         return cost
 
     def objective_incr_local(self, lmove: LocalMove) -> Optional[float]:
-        raise NotImplementedError
-        # i, j = lmove.i, lmove.j
-        # ndist = self.dist
-        # ndist -= self.problem.dist[self.path[i-1]][self.path[i]]
-        # ndist -= self.problem.dist[self.path[j-1]][self.path[j]]
-        # ndist += self.problem.dist[self.path[i-1]][self.path[j-1]]
-        # ndist += self.problem.dist[self.path[i]][self.path[j]]
-        # return ndist - self.dist
-
-        # TODO: we recalculate the cost => cost_prime
-        # TODO: incremental = cost_prime - cost
+        i, j = lmove.i, lmove.j
+        
         # initialize new_solution
-        new_solution = self.solution 
+        new_path = self.path 
         # switch order between i and j
-        temp = new_solution[i]
-        new_solution[i] = new_solution[j]
-        new_solution[j] = temp
+        temp = new_path[i]
+        new_path[i] = new_path[j]
+        new_path[j] = temp
 
-        new_cost = self.calculate_cost(new_solution)
+        new_cost = self.calculate_cost(new_path)
 
         return new_cost - self.cost
 
