@@ -238,7 +238,7 @@ class Problem:
         """
         depot_to_container = [[], []]
         container_to_plant = [[], []]
-        # index - combination: 0 - 00, 1 - 10, 2 - 11, 3 - 10
+        # index - combination: 0 - 00, 1 - 01, 2 - 11, 3 - 10
         container_to_container = [[], [], [], []]
 
         n = int(f.readline())
@@ -258,9 +258,9 @@ class Problem:
             elif idx < 2 * n + 5:
                 container_to_container[1].append(elements)
             elif idx < 3 * n + 5:
-                container_to_container[2].append(elements)
-            else:
                 container_to_container[3].append(elements)
+            else:
+                container_to_container[2].append(elements)
 
         return cls(n, depot_to_container, container_to_plant, container_to_container)
 
