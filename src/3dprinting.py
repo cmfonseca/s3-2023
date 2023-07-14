@@ -96,6 +96,10 @@ class Solution():
             if d > d_max:
                 d_max = d
 
+        if total_cost > 0:
+            w = self.problem.penalty_weights[path[-1]]
+            total_cost *= w
+
         return total_cost - d_max
 
     def add_moves(self) -> Iterable[Component]:
