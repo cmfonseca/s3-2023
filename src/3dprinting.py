@@ -56,12 +56,14 @@ class Solution():
                  path: Path,
                  used: Used,
                  unused: Unused,
-                 cost: int) -> None:
+                 cost: int,
+                 time_spent: int) -> None:
         self.problem = problem
         self.path = path
         self.used = used
         self.unused = unused
         self.cost = cost
+        self.time_spent = time_spent
 
     def output(self) -> str:
         return "\n".join(map(str, self.path))
@@ -71,7 +73,8 @@ class Solution():
                               copy(self.path),
                               copy(self.used),
                               copy(self.unused),
-                              self.cost)
+                              self.cost,
+                              self.time_spent)
 
     def is_feasible(self) -> bool:
         return len(self.path) == self.problem.n_items
@@ -124,47 +127,31 @@ class Solution():
                 yield LocalMove(i, j)
 
     def heuristic_add_move(self) -> Optional[Component]:
-        raise NotImplementedError
-        Return the closest
         if len(self.path) < self.problem.n_items:
-            best = None
-            bestd = None
-            u = self.path[-1]
-            for v in self.unused:
-                d = self.problem.dist[u][v] 
-                if bestd is None or d < bestd:
-                    best = Component(u, v)
-                    bestd = d
-            return best
-        elif len(self.path) == self.problem.n_items:
-            u = self.path[-1]
-            return Component(u, self.start)
-        return None
+            max_heuristic_weight = - float('inf')
+            idx = 0
+            for k in self.used:
+                heuristic_weight = self.problem.penalty_weights[k] / (self.problem.due_dates[k] + 1)
+                if heuristic_weight > max_heuristic_weight:
+                    max_heuristic_weight = heuristic_weight
+                    idx = k
+            return Component(idx)
 
     def add(self, component: Component) -> None:
-        raise NotImplementedError
-        # u, v = component.u, component.v
-        # self.path.append(v)
-        # if v != self.start:
-        #     self.unused.remove(v)
-        # self.used.add(v)
-        # self.dist += self.problem.dist[u][v]
+        self.path.append(component.k)
+        self.unused.remove(component.k)
+        self.used.add(component.k)
+        self.time_spent += self.problem.production_times[component.k]
+        self.cost += self.problem.penalty_weights[component.k] * max(0, self.time_spent-self.problem.due_dates[component.k])
 
     def step(self, lmove: LocalMove) -> None:
-        raise NotImplementedError
-        # i, j = lmove.i, lmove.j
-        # self.dist -= self.problem.dist[self.path[i-1]][self.path[i]]
-        # self.dist -= self.problem.dist[self.path[j-1]][self.path[j]]
-        # self.path[i:j] = list(reversed(self.path[i:j]))
-        # self.dist += self.problem.dist[self.path[i-1]][self.path[i]]
-        # self.dist += self.problem.dist[self.path[j-1]][self.path[j]]
-
-        # if __debug__:
-        #     dist = sum(map(lambda t: self.problem.dist[t[0]][t[1]],
-        #                    pairwise(self.path)))
-        #     assert isclose(dist, self.dist), (dist, self.dist)
-        #     assert self.path[0] == self.start, self.path
-        #     assert self.path[-1] == self.start, self.path
+        i, j = lmove.i, lmove.j
+        self.path[i], self.path[j] = self.path[j], self.path[i]
+        time_spent = 0
+        cost = 0
+        for k in self.path:
+            time_spent += self.problem.production_times[k]
+            cost += self.problem.penalty_weights[k] * max(0, time_spent - self.problem.due_dates[k])
 
     def objective_incr_local(self, lmove: LocalMove) -> Optional[float]:
         raise NotImplementedError
@@ -191,16 +178,17 @@ class Solution():
             return 0
 
     def perturb(self, ks: int) -> None:
-        raise NotImplementedError
-        # for _ in range(ks):
-        #     move = self.random_local_move()
-        #     if move is not None:
-        #         self.step(move)
+        for _ in range(ks):
+            move = self.random_local_move()
+            if move is not None:
+                self.step(move)
 
     def components(self) -> Iterable[Component]:
-        raise NotImplementedError
-        # for i in range(1, len(self.path)):
-        #     yield Component(self.path[i-1], self.path[i])
+        for k in range(len(self.path)):
+            yield Component(k)
+
+    def objective(self) -> Optional[int]:
+        return self.cost
 
 
 class Problem():
@@ -223,7 +211,7 @@ class Problem():
         return cls(nums[:n], nums[n:2*n], nums[2*n:])
 
     def empty_solution(self) -> Solution:
-        return Solution(self, 0, [0], {0}, set(range(1, self.n_items)), 0)
+        return Solution(self, [], [], set(range(self.n_items)), 0, 0)
 
     def empty_solution_with_start(self, start: int) -> Solution:
         return Solution(self, start, [start], {start}, set(range(self.n_items))-{start}, 0)
