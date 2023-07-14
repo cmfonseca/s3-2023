@@ -58,14 +58,15 @@ def evaluate(inputfile, outputfile):
     score = 0
     dist = 0
     nonzero = 0
-    for i in range(1, len(path)):
-        last = nodes[path[i-1]]
+    last = nodes[0]
+    for i in range(len(path)):
         nxt = nodes[path[i]]
         incr = candle_score(nxt, dist, last)
         if incr > 0:
             nonzero += 1
         score += incr
-        dist += manhattan_distance(nxt, last)
+        dist += manhattan_distance(last, nxt)
+        last = nxt
 
     return score
 
