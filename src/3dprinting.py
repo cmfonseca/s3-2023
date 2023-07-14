@@ -85,8 +85,23 @@ class Solution():
         else:
             return None
 
-    def lower_bound(self) -> Optional[int]:
-        return self.cost
+    def lower_bound(self, path=None) -> Optional[int]:
+        # return self.cost
+        # Cj - d_j
+        total_cost = 0
+        if path is None:
+            path = self.path
+        for i in path:
+            total_cost += self.problem.production_times[i]
+            # d = self.problem.due_dates[i]
+            # if d > d_max:
+            #     d_max = d
+
+        if total_cost > 0:
+            w = self.problem.penalty_weights[path[-1]]
+            total_cost *= w
+
+        return total_cost - self.problem.due_dates[path[-1]]
 
     def add_moves(self) -> Iterable[Component]:
         if len(self.path) < self.problem.n_items:
@@ -149,13 +164,18 @@ class Solution():
         # return ndist - self.dist
 
     def lower_bound_incr_add(self, component: Component) -> Optional[float]:
-        raise NotImplementedError
-        # if len(self.path) + 1 <= cast(Problem, self.problem).n_items:
-        #     u, v = component.u, component.v
-        #     d = self.problem.dist[u][v]
-        #     return d
-        # else:
-        #     return 0
+        # raise NotImplementedError
+        if len(self.path) <= cast(Problem, self.problem).n_items:
+            # u, v = component.u, component.v
+            # d = self.problem.dist[u][v]
+            # new_lower_bound - old_lower_bound
+            # Component : k -> index of next item
+            new_path = copy(self.path).append(component.k)
+            new_lower_bound = self.lower_bound(new_path)
+            return new_lower_bound - self.lower_bound()
+            
+        else:
+            return 0
 
     def perturb(self, ks: int) -> None:
         for _ in range(ks):
