@@ -56,12 +56,14 @@ class Solution():
                  path: Path,
                  used: Used,
                  unused: Unused,
-                 cost: int) -> None:
+                 cost: int,
+                 time_spent: int) -> None:
         self.problem = problem
         self.path = path
         self.used = used
         self.unused = unused
         self.cost = cost
+        self.time_spent = time_spent
 
     def output(self) -> str:
         return "\n".join(map(str, self.path))
@@ -109,19 +111,22 @@ class Solution():
                 yield LocalMove(i, j)
 
     def heuristic_add_move(self) -> Optional[Component]:
-        raise NotImplementedError
-        #if len(self.path) < self.problem.n_items:
-        #    map(lambda k: self.problem.penalty_weights[k] / (self.problem.due_dates[k] + 1), self.unused)
-        #return None
+        if len(self.path) < self.problem.n_items:
+            max_heuristic_weight = - float('inf')
+            idx = 0
+            for k in self.used:
+                heuristic_weight = self.problem.penalty_weights[k] / (self.problem.due_dates[k] + 1)
+                if heuristic_weight > max_heuristic_weight:
+                    max_heuristic_weight = heuristic_weight
+                    idx = k
+            return Component(idx)
 
     def add(self, component: Component) -> None:
-        raise NotImplementedError
-        # u, v = component.u, component.v
-        # self.path.append(v)
-        # if v != self.start:
-        #     self.unused.remove(v)
-        # self.used.add(v)
-        # self.dist += self.problem.dist[u][v]
+        self.path.append(component.k)
+        self.unused.remove(component.k)
+        self.used.add(component.k)
+        self.time_spent += self.problem.production_times[component.k]
+        self.cost += self.problem.penalty_weights[component.k] * max(0, self.time_spent-self.problem.due_dates[component.k])
 
     def step(self, lmove: LocalMove) -> None:
         raise NotImplementedError
