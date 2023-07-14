@@ -77,10 +77,10 @@ class Solution():
                               self.time_spent)
 
     def is_feasible(self) -> bool:
-        return len(self.path) == self.problem.n_items
+        return len(self.path) == self.problem.nnodes
 
     def objective(self) -> Optional[int]:
-        if len(self.path) == self.problem.n_items:
+        if len(self.path) == self.problem.nnodes:
             return self.cost
         else:
             return None
@@ -104,7 +104,7 @@ class Solution():
         return total_cost - (self.problem.due_dates[path[-1]] if len(path) > 0 else 0)
 
     def add_moves(self) -> Iterable[Component]:
-        if len(self.path) < self.problem.n_items:
+        if len(self.path) < self.problem.nnodes:
             for k in self.unused:
                 yield Component(k)
 
@@ -127,10 +127,10 @@ class Solution():
                 yield LocalMove(i, j)
 
     def heuristic_add_move(self) -> Optional[Component]:
-        if len(self.path) < self.problem.n_items:
+        if len(self.path) < self.problem.nnodes:
             max_heuristic_weight = - float('inf')
             idx = 0
-            for k in self.used:
+            for k in self.unused:
                 heuristic_weight = self.problem.penalty_weights[k] / (self.problem.due_dates[k] + 1)
                 if heuristic_weight > max_heuristic_weight:
                     max_heuristic_weight = heuristic_weight
@@ -185,7 +185,7 @@ class Solution():
 
     def lower_bound_incr_add(self, component: Component) -> Optional[float]:
         # raise NotImplementedError
-        if len(self.path) <= cast(Problem, self.problem).n_items:
+        if len(self.path) <= cast(Problem, self.problem).nnodes:
             # u, v = component.u, component.v
             # d = self.problem.dist[u][v]
             # new_lower_bound - old_lower_bound
@@ -219,7 +219,7 @@ class Problem():
         due_dates: list[int]
     ) -> None:
         assert len(production_times) == len(penalty_weights) == len(due_dates)
-        self.n_items = len(production_times)
+        self.nnodes = len(production_times)
         self.production_times = production_times
         self.penalty_weights = penalty_weights
         self.due_dates = due_dates
@@ -234,7 +234,10 @@ class Problem():
         return cls(nums[:n], nums[n:2*n], nums[2*n:])
 
     def empty_solution(self) -> Solution:
-        return Solution(self, [], set(), set(range(self.n_items)), 0, 0)
+        return Solution(self, [], set(), set(range(self.nnodes)), 0, 0)
+    
+    def empty_solution_with_start(self, start: int) -> Solution:
+        return Solution(self, start, Path([start]), Used({start}), Unused(set(range(self.nnodes))-{start}), 0)
 
 
 if __name__ == '__main__':
@@ -280,13 +283,13 @@ if __name__ == '__main__':
         elif args.csearch == 'heuristic':
             s = heuristic_construction(s)
         elif args.csearch == 'as':
-            ants = [p.empty_solution_with_start(i) for i in range(p.n_items)]
+            ants = [p.empty_solution_with_start(i) for i in range(p.nnodes)]
             # s = aco(ants, 30.0, beta = 5.0, rho = 0.5, tau0 = 1 / 3000.0)
             lbudget = 1.0 / len(ants)
             s = ant_system(ants, args.cbudget, beta = 5.0, rho = 0.5, tau0 = 1 / 3000.0,
                            local_search = lambda s: first_improvement(s, lbudget))
         elif args.csearch == 'mmas':
-            ants = [p.empty_solution_with_start(i) for i in range(p.n_items)]
+            ants = [p.empty_solution_with_start(i) for i in range(p.nnodes)]
             # s = mmas(ants, 30.0, beta = 5.0, rho = 0.02, taumax = 1 / 3000.0, ants = 0.1)
             lbudget = 1.0 / len(ants)
             s = mmas(ants, args.cbudget, beta = 5.0, rho = 0.05, taumax = 1 / 3000.0, globalratio = 0.1,
