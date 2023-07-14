@@ -129,20 +129,13 @@ class Solution():
         self.cost += self.problem.penalty_weights[component.k] * max(0, self.time_spent-self.problem.due_dates[component.k])
 
     def step(self, lmove: LocalMove) -> None:
-        raise NotImplementedError
-        # i, j = lmove.i, lmove.j
-        # self.dist -= self.problem.dist[self.path[i-1]][self.path[i]]
-        # self.dist -= self.problem.dist[self.path[j-1]][self.path[j]]
-        # self.path[i:j] = list(reversed(self.path[i:j]))
-        # self.dist += self.problem.dist[self.path[i-1]][self.path[i]]
-        # self.dist += self.problem.dist[self.path[j-1]][self.path[j]]
-
-        # if __debug__:
-        #     dist = sum(map(lambda t: self.problem.dist[t[0]][t[1]],
-        #                    pairwise(self.path)))
-        #     assert isclose(dist, self.dist), (dist, self.dist)
-        #     assert self.path[0] == self.start, self.path
-        #     assert self.path[-1] == self.start, self.path
+        i, j = lmove.i, lmove.j
+        self.path[i], self.path[j] = self.path[j], self.path[i]
+        time_spent = 0
+        cost = 0
+        for k in self.path:
+            time_spent += self.problem.production_times[k]
+            cost += self.problem.penalty_weights[k] * max(0, time_spent - self.problem.due_dates[k])
 
     def objective_incr_local(self, lmove: LocalMove) -> Optional[float]:
         raise NotImplementedError
