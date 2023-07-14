@@ -84,23 +84,21 @@ class Solution():
 
     def lower_bound(self, path=None) -> Optional[int]:
         # return self.cost
-        # Cj - d_max
+        # Cj - d_j
         total_cost = 0
-        d_max = -1
         if path is None:
             path = self.path
         for i in path:
             total_cost += self.problem.production_times[i]
-            d = self.problem.due_dates[i]
-
-            if d > d_max:
-                d_max = d
+            # d = self.problem.due_dates[i]
+            # if d > d_max:
+            #     d_max = d
 
         if total_cost > 0:
             w = self.problem.penalty_weights[path[-1]]
             total_cost *= w
 
-        return total_cost - d_max
+        return total_cost - self.problem.due_dates[path[-1]]
 
     def add_moves(self) -> Iterable[Component]:
         if len(self.path) < self.problem.n_items:
