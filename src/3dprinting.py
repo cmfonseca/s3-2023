@@ -73,7 +73,8 @@ class Solution():
                               copy(self.path),
                               copy(self.used),
                               copy(self.unused),
-                              self.cost)
+                              self.cost,
+                              self.time_spent)
 
     def is_feasible(self) -> bool:
         return len(self.path) == self.problem.n_items
@@ -166,6 +167,9 @@ class Solution():
         for k in range(len(self.path)):
             yield Component(k)
 
+    def objective(self) -> Optional[int]:
+        return self.cost
+
 
 class Problem():
     def __init__(
@@ -187,7 +191,7 @@ class Problem():
         return cls(nums[:n], nums[n:2*n], nums[2*n:])
 
     def empty_solution(self) -> Solution:
-        return Solution(self, 0, [0], {0}, set(range(1, self.n_items)), 0)
+        return Solution(self, [], [], set(range(self.n_items)), 0, 0)
 
     def empty_solution_with_start(self, start: int) -> Solution:
         return Solution(self, start, [start], {start}, set(range(self.n_items))-{start}, 0)
