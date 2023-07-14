@@ -74,11 +74,20 @@ class Solution:
                               copy(self.not_picked),
                               self.obj_value)
 
-    def is_feasible(self) -> bool:
+     def is_feasible(self) -> bool:
         """
         Return whether the solution is feasible or not
         """
-        return len(self.not_picked) == 0
+        #Constraint 1: check if all containers are included in the solution (or picked)
+        unique_containers = list(set(self.containers)) #remove duplicates
+        
+        if (len(unique_containers) != self.problem.n):
+            return False
+        else:
+            #check other constraints
+            return True
+                
+        raise NotImplementedError
 
     def objective(self) -> Optional[Objective]:
         """
