@@ -25,47 +25,47 @@ import logging
 
 Objective = Any
 
+
 class Component:
     @property
     def cid(self) -> Hashable:
         raise NotImplementedError
 
+
 class LocalMove:
     ...
-        
+
+
 class Solution:
     def __init__(self,
-         problem: Problem,
-         obj_value: float) -> None:
-             self.problem = problem
-             self.containers = [] #list of all containers between depot and treatment plant
-             self.directions = [] #list of directions proportionate to the containers
-             self.picked = [] #list of all picked containers
-             self.not_picked = [] #list of all not yet picked containers
-             self.obj_value = obj_value
-      
+                 problem: Problem,
+                 obj_value: float) -> None:
+        self.problem = problem
+        self.containers = []  # list of all containers between depot and treatment plant
+        self.directions = []  # list of directions proportionate to the containers
+        self.picked = []  # list of all picked containers
+        self.not_picked = []  # list of all not yet picked containers
+        self.obj_value = obj_value
+
     def output(self) -> str:
-        no_of_containers = len(self.containers)
-        for i in no_of_containers:
-            print(self.containers[i] + " " + self.directions[i])
         """
         Generate the output string for this solution
         """
-        raise NotImplementedError
+        for i in range(len(self.containers)):
+            print(self.containers[i] + " " + self.directions[i])
 
     def copy(self) -> Solution:
-        return self.__class__(self.problem,
-                              copy(self.containers),
-                              copy(self.picked),
-                              copy(self.not_picked),
-                              self.obj_value)
         """
         Return a copy of this solution.
 
         Note: changes to the copy must not affect the original
         solution. However, this does not need to be a deepcopy.
         """
-        #raise NotImplementedError
+        return self.__class__(self.problem,
+                              copy(self.containers),
+                              copy(self.picked),
+                              copy(self.not_picked),
+                              self.obj_value)
 
     def is_feasible(self) -> bool:
         """
@@ -117,7 +117,7 @@ class Solution:
         the solution.
         """
         raise NotImplementedError
-            
+
     def heuristic_add_move(self) -> Optional[Component]:
         """
         Return the next component to be added based on some heuristic
@@ -172,9 +172,10 @@ class Solution:
         """
         raise NotImplementedError
 
+
 class Problem:
-    @classmethod
-    def __int__(self, n, depot_to_container, container_to_plant, container_to_container):
+
+    def __int__(self, n: int, depot_to_container: list, container_to_plant: list, container_to_container: list) -> None:
         self.n = n
         self.depot_to_container = depot_to_container
         self.container_to_plant = container_to_plant
@@ -255,19 +256,19 @@ if __name__ == '__main__':
         elif args.csearch == 'beam':
             s = beam_search(s, 10)
         elif args.csearch == 'grasp':
-            s = grasp(s, args.cbudget, alpha = 0.01)
+            s = grasp(s, args.cbudget, alpha=0.01)
         elif args.csearch == 'as':
-            ants = [s]*100
-            s = ant_system(ants, args.cbudget, beta = 5.0, rho = 0.5, tau0 = 1 / 3000.0)
+            ants = [s] * 100
+            s = ant_system(ants, args.cbudget, beta=5.0, rho=0.5, tau0=1 / 3000.0)
         elif args.csearch == 'mmas':
-            ants = [s]*100
-            s = mmas(ants, args.cbudget, beta = 5.0, rho = 0.02, taumax = 1 / 3000.0, globalratio = 0.5)
+            ants = [s] * 100
+            s = mmas(ants, args.cbudget, beta=5.0, rho=0.02, taumax=1 / 3000.0, globalratio=0.5)
 
     if s is not None:
         if args.lsearch == 'bi':
             s = best_improvement(s, args.lbudget)
         elif args.lsearch == 'fi':
-            s = first_improvement(s, args.lbudget) 
+            s = first_improvement(s, args.lbudget)
         elif args.lsearch == 'ils':
             s = ils(s, args.lbudget)
         elif args.lsearch == 'rls':
@@ -286,5 +287,4 @@ if __name__ == '__main__':
     else:
         logging.info(f"Objective: no solution found")
 
-    logging.info(f"Elapsed solving time: {end-start:.4f}")
-
+    logging.info(f"Elapsed solving time: {end - start:.4f}")
