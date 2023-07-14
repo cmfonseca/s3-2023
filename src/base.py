@@ -39,20 +39,27 @@ class LocalMove:
 class Solution:
     def __init__(self,
                  problem: Problem,
+                 containers: list,
+                 directions: list,
+                 picked: list,
+                 not_picked: list,
                  obj_value: float) -> None:
         self.problem = problem
-        self.containers = []  # list of all containers between depot and treatment plant
-        self.directions = []  # list of directions proportionate to the containers
-        self.picked = []  # list of all picked containers
-        self.not_picked = []  # list of all not yet picked containers
+        self.containers = containers  # list of all containers between depot and treatment plant
+        self.directions = directions  # list of directions proportionate to the containers
+        self.picked = picked  # list of all picked containers
+        self.not_picked = not_picked  # list of all not yet picked containers
         self.obj_value = obj_value
 
     def output(self) -> str:
         """
         Generate the output string for this solution
         """
+        str = ""
         for i in range(len(self.containers)):
-            print(self.containers[i] + " " + self.directions[i])
+            str += self.containers[i] + " " + self.directions[i] + "\n"
+
+        return str
 
     def copy(self) -> Solution:
         """
@@ -238,7 +245,7 @@ class Problem:
         """
         depot_to_container = [[], []]
         container_to_plant = [[], []]
-        # index - combination: 0 - 00, 1 - 01, 2 - 11, 3 - 10
+        # index - combination: 0 - 00, 1 - 01, 2 - 10, 3 - 11
         container_to_container = [[], [], [], []]
 
         n = int(f.readline())
@@ -263,6 +270,7 @@ class Problem:
                 container_to_container[2].append(elements)
 
         return cls(n, depot_to_container, container_to_plant, container_to_container)
+
 
 
 if __name__ == '__main__':
