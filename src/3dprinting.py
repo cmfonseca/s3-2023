@@ -164,16 +164,14 @@ class Solution():
         #     return 0
 
     def perturb(self, ks: int) -> None:
-        raise NotImplementedError
-        # for _ in range(ks):
-        #     move = self.random_local_move()
-        #     if move is not None:
-        #         self.step(move)
+        for _ in range(ks):
+            move = self.random_local_move()
+            if move is not None:
+                self.step(move)
 
     def components(self) -> Iterable[Component]:
-        raise NotImplementedError
-        # for i in range(1, len(self.path)):
-        #     yield Component(self.path[i-1], self.path[i])
+        for k in range(len(self.path)):
+            yield Component(k)
 
 
 class Problem():
