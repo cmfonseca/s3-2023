@@ -237,7 +237,7 @@ class Problem():
         return Solution(self, [], set(), set(range(self.nnodes)), 0, 0)
     
     def empty_solution_with_start(self, start: int) -> Solution:
-        return Solution(self, start, Path([start]), Used({start}), Unused(set(range(self.nnodes))-{start}), 0)
+        return Solution(self, Path([start]), Used({start}), Unused(set(range(self.nnodes))-{start}), 0, 0)
 
 
 if __name__ == '__main__':
