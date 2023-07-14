@@ -101,7 +101,7 @@ class Solution():
             w = self.problem.penalty_weights[path[-1]]
             total_cost *= w
 
-        return total_cost - self.problem.due_dates[path[-1]]
+        return total_cost - (self.problem.due_dates[path[-1]] if len(path) > 0 else 0)
 
     def add_moves(self) -> Iterable[Component]:
         if len(self.path) < self.problem.n_items:
@@ -220,6 +220,9 @@ class Problem():
     ) -> None:
         assert len(production_times) == len(penalty_weights) == len(due_dates)
         self.n_items = len(production_times)
+        self.production_times = production_times
+        self.penalty_weights = penalty_weights
+        self.due_dates = due_dates
         
     @classmethod
     def from_textio(cls, inputfile) -> Problem:
@@ -231,10 +234,7 @@ class Problem():
         return cls(nums[:n], nums[n:2*n], nums[2*n:])
 
     def empty_solution(self) -> Solution:
-        return Solution(self, [], [], set(range(self.n_items)), 0, 0)
-
-    def empty_solution_with_start(self, start: int) -> Solution:
-        return Solution(self, start, [start], {start}, set(range(self.n_items))-{start}, 0)
+        return Solution(self, [], set(), set(range(self.n_items)), 0, 0)
 
 
 if __name__ == '__main__':
