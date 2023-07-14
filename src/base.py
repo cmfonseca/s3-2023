@@ -71,7 +71,7 @@ class Solution:
         """
         Return whether the solution is feasible or not
         """
-        raise NotImplementedError
+        return len(self.not_picked) == 0
 
     def objective(self) -> Optional[Objective]:
         """
@@ -91,8 +91,8 @@ class Solution:
             # add route between containers
             else:
                 # construct the direction index by concat the directions to a binary string a read it in dec
-                direction_idx = int(str(self.directions[idx - 1]) + str(self.directions[idx]), 2)
-                obj_value += self.problem.container_to_container[direction_idx][self.containers[idx - 1]][
+                dir_idx = int(str(self.directions[idx - 1]) + str(self.directions[idx]), 2)
+                obj_value += self.problem.container_to_container[dir_idx][self.containers[idx - 1]][
                     self.containers[idx]]
 
         # add the route from the last container to the plant
@@ -105,7 +105,37 @@ class Solution:
         Return the lower bound value for this solution if defined,
         otherwise return None
         """
-        raise NotImplementedError
+        obj_value = 0
+        for idx in range(len(self.containers)):
+            # add the route from the depot to the first container
+            if idx == 0:
+                obj_value += self.problem.depot_to_container[self.directions[idx]][self.containers[idx]]
+
+            # add route between containers
+            else:
+                # construct the direction index by concat the directions to a binary string a read it in dec
+                dir_idx = int(str(self.directions[idx - 1]) + str(self.directions[idx]), 2)
+                obj_value += self.problem.container_to_container[dir_idx][self.containers[idx - 1]][
+                    self.containers[idx]]
+
+        for dest_con in self.not_picked:
+            options = []
+            for dep_con in self.not_picked:
+                for dir_idx in range(4):
+                    if dep_con != dest_con:
+                        options.append(self.problem.container_to_container[dir_idx][dep_con][dest_con])
+
+            # add the minimum value
+            obj_value += min(options)
+
+        # add the route from the last container to the plant
+        options = []
+        for dep_con in self.not_picked:
+            for dir_idx in range(4):
+                options.append(self.problem.container_to_plant[dir_idx][dep_con])
+        obj_value += min(options)
+
+        return obj_value
 
     def add_moves(self) -> Iterable[Component]:
         """
@@ -194,8 +224,7 @@ class Solution:
 
 
 class Problem:
-
-    def __int__(self, n: int, depot_to_container: list, container_to_plant: list, container_to_container: list) -> None:
+    def __init__(self, n: int, depot_to_container: list, container_to_plant: list, container_to_container: list) -> None:
         self.n = n
         self.depot_to_container = depot_to_container
         self.container_to_plant = container_to_plant
