@@ -41,8 +41,8 @@ class Solution:
                  problem: Problem,
                  containers: list,
                  directions: list,
-                 picked: list,
-                 not_picked: list,
+                 picked: set,
+                 not_picked: set,
                  obj_value: float) -> None:
         self.problem = problem
         self.containers = containers  # list of all containers between depot and treatment plant
@@ -231,7 +231,8 @@ class Solution:
 
 
 class Problem:
-    def __init__(self, n: int, depot_to_container: list, container_to_plant: list, container_to_container: list) -> None:
+    def __init__(self, n: int, depot_to_container: list, container_to_plant: list,
+                 container_to_container: list) -> None:
         self.n = n
         self.depot_to_container = depot_to_container
         self.container_to_plant = container_to_plant
@@ -271,6 +272,8 @@ class Problem:
 
         return cls(n, depot_to_container, container_to_plant, container_to_container)
 
+    def empty_solution(self) -> Solution:
+        return Solution(self, [], [], set([]), set(range(self.n)), 0)
 
 
 if __name__ == '__main__':
